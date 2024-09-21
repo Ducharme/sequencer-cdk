@@ -1,0 +1,91 @@
+datadog:
+  apiKeyExistingSecret: datadog-api-secret
+  appKeyExistingSecret: datadog-app-kubernetes-secret
+  logLevel: INFO
+  useHostPID: true
+  collectEvents: true
+  logs:
+    enabled: true
+    containerCollectAll: true
+    autoMultiLineDetection: true
+  apm:
+    enabled: true
+    portEnabled: true
+    socketEnabled: true
+    port: 8126
+    instrumentation:
+      enabled: true
+      libVersions:
+        dotnet: v3.2.0
+      language_detection:
+        enabled: true
+  serviceMonitoring:
+    enabled: true
+  processAgent:
+    enabled: true
+    processCollection: true
+    containerCollection: true
+    stripProcessArguments: true
+    processDiscovery: true
+    runInCoreAgent: false
+  containerImageCollection:
+    enabled: true
+  orchestratorExplorer:
+    enabled: true  
+  networkMonitoring:
+    enabled: true
+  systemProbe:
+    enableTCPQueueLength: true
+    enableOOMKill: true
+  kubelet:
+    tlsVerify: false
+  dogstatsd:
+    port: 8125
+    useHostPort: true
+    useHostPID: true
+    nonLocalTraffic: true
+  containerRuntimeSupport:
+    enabled: true
+
+clusterAgent:
+  enabled: true
+  replicas: 1
+  createPodDisruptionBudget: true
+  metricsProvider:
+    enabled: true
+  admissionController:
+    enabled: true
+    mutateUnlabelled: true
+    
+agents:
+  enabled: true
+  containers:
+    logLevel: DEBUG
+    agent:
+      logLevel: INFO
+      env:
+        - name: DD_ENV
+          value: "poc"
+        - name: DD_APM_ENV
+          value: "poc"
+    traceAgent:
+      logLevel: INFO
+      env:
+        - name: DD_ENV
+          value: "poc"
+        - name: DD_APM_ENV
+          value: "poc"
+    processAgent:
+      logLevel: INFO
+      env:
+        - name: DD_ENV
+          value: "poc"
+        - name: DD_APM_ENV
+          value: "poc"
+    systemProbe:
+      logLevel: INFO
+      env:
+        - name: DD_ENV
+          value: "poc"
+        - name: DD_APM_ENV
+          value: "poc"

@@ -1,0 +1,130 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sequencerwebservice
+  labels:
+    tags.datadoghq.com/env: poc
+    tags.datadoghq.com/service: sequencerwebservice
+    tags.datadoghq.com/version: 0.0.11-dd
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sequencerwebservice
+  template:
+    metadata:
+      labels:
+        app: sequencerwebservice
+        tags.datadoghq.com/env: poc
+        tags.datadoghq.com/service: sequencerwebservice
+        tags.datadoghq.com/version: 0.0.11-dd
+        admission.datadoghq.com/enabled: "true"
+      annotations:
+        ad.datadoghq.com/app.logs: '[{"source":"csharp", "service":"sequencerwebservice", "tags":["company:lafleet"]}]'
+        admission.datadoghq.com/dotnet-lib.version: v2.57.0
+        admission.datadoghq.com/sequencerwebservice.apm-instrumentation: "true"
+        admission.datadoghq.com/sequencerwebservice.apm-socket: "/var/run/datadog/apm.socket"
+    spec:
+      serviceAccountName: sequencer-pod-service-account
+      containers:
+      - name: sequencerwebservice
+        image: claudeducharme/sequencerwebservice:0.0.11-dd
+        ports:
+        - containerPort: 8080
+        envFrom:
+        - configMapRef:
+            name: sequencer-config
+        env:
+        - name: REDIS_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: aws-secrets
+              key: redis-password
+        - name: DD_ENV
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.labels['tags.datadoghq.com/env']
+        - name: DD_SERVICE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.labels['tags.datadoghq.com/service']
+        - name: DD_VERSION
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.labels['tags.datadoghq.com/version']
+        - name: DD_DYNAMIC_INSTRUMENTATION_ENABLED
+          value: "true"
+        - name: DD_APM_ENABLED
+          value: "true"
+        - name: DD_PROFILING_ENABLED
+          value: "1"
+        - name: CORECLR_ENABLE_PROFILING
+          value: "1"
+        - name: CORECLR_PROFILER
+          value: "{846F5F1C-F9AE-4B07-969E-05C26BC060D8}"
+        - name: CORECLR_PROFILER_PATH
+          value: "/opt/datadog/Datadog.Trace.ClrProfiler.Native.so"
+        - name: LD_PRELOAD
+          value: "/opt/datadog/continuousprofiler/Datadog.Linux.ApiWrapper.x64.so"
+        - name: DD_DOTNET_TRACER_HOME
+          value: "/opt/datadog"
+        - name: DD_LOGS_INJECTION
+          value: "true"
+        - name: DD_TRACE_ANALYTICS_ENABLED
+          value: "true"
+        - name: DD_APPSEC_ENABLED
+          value: "true"
+        - name: DD_RUNTIME_METRICS_ENABLED
+          value: "true"
+        - name: DD_DOGSTATSD_NON_LOCAL_TRAFFIC
+          value: "true"
+        - name: DD_PROFILING_WALLTIME_ENABLED
+          value: "true"
+        - name: DD_PROFILING_CPU_ENABLED
+          value: "true"
+        - name: DD_PROFILING_EXCEPTION_ENABLED
+          value: "true"
+        - name: DD_PROFILING_ALLOCATION_ENABLED
+          value: "true"
+        - name: DD_PROFILING_LOCK_ENABLED
+          value: "true"
+        - name: DD_PROFILING_HEAP_ENABLED
+          value: "true"
+        - name: DD_PROFILING_GC_ENABLED
+          value: "true"
+        readinessProbe:
+          httpGet:
+            path: /healthz
+            port: 8080
+          periodSeconds: 5
+          initialDelaySeconds: 6
+          failureThreshold: 3
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 8080
+          periodSeconds: 2
+          failureThreshold: 3
+        volumeMounts:
+        - name: secrets-store-inline
+          mountPath: "/mnt/secrets-store"
+          readOnly: true
+      volumes:
+      - name: secrets-store-inline
+        csi:
+          driver: secrets-store.csi.k8s.io
+          readOnly: true
+          volumeAttributes:
+            secretProviderClass: "aws-secrets"
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - sequencerwebservice
+              topologyKey: "kubernetes.io/hostname"

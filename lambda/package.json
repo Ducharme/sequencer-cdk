@@ -1,0 +1,6 @@
+{
+    "dependencies": {
+      "@aws-sdk/client-elasticache": "^3.632.0",
+      "@aws-sdk/client-secrets-manager": "^3.632.0"
+    }
+}
