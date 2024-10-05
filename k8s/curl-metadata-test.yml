@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: curl-metadata-test
+spec:
+  containers:
+  - name: curl
+    image: curlimages/curl
+    command: ["/bin/sh"]
+    args: ["-c", "while true; do sleep 30; done"]
+  restartPolicy: Never
+  

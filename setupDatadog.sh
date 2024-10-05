@@ -1,6 +1,6 @@
 #!/bin/sh
 
-. setDatadogEnvVars.sh
+. ./setDatadogEnvVars.sh
 
 kubectl delete secret datadog-api-secret
 kubectl delete secret datadog-app-kubernetes-secret

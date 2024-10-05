@@ -6,7 +6,7 @@ helm repo add autoscaler https://kubernetes.github.io/autoscaler
 
 helm repo update
 
-helm install csi-secrets-store secrets-store-csi-driver/secrets-store-csi-driver -f secrets-store-csi-values.yml -n kube-system
+helm install csi-secrets-store secrets-store-csi-driver/secrets-store-csi-driver -f k8s/secrets-store-csi-values.yml -n kube-system
 # syncSecret.enabled=true https://secrets-store-csi-driver.sigs.k8s.io/topics/sync-as-kubernetes-secret
 # Now you can follow these steps https://secrets-store-csi-driver.sigs.k8s.io/getting-started/usage.html
 # kubectl --namespace=kube-system get pods -l "app=secrets-store-csi-driver"

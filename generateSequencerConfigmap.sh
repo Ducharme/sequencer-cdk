@@ -1,5 +1,7 @@
 #!/bin/sh
 
+. ./setRedisStackName.sh
+
 GROUP_NAME=poc
 
 #PGSQL_ENDPOINT=sequencer-aurora-cluster.cluster-<random>.<region>.rds.amazonaws.com
@@ -8,9 +10,9 @@ GROUP_NAME=poc
 #PGSQL_PASSWORD=<password>
 #PGSQL_DATABASE=sequencer
 
-REDIS_ENDPOINT=$(aws cloudformation describe-stacks --stack-name RedisStack --query "Stacks[0].Outputs[?OutputKey=='RedisEndpoint'].OutputValue" --output text)
-REDIS_PORT=$(aws cloudformation describe-stacks --stack-name RedisStack --query "Stacks[0].Outputs[?OutputKey=='RedisPort'].OutputValue" --output text)
-REDIS_USER=$(aws cloudformation describe-stacks --stack-name RedisStack --query "Stacks[0].Outputs[?OutputKey=='RedisUser'].OutputValue" --output text)
+REDIS_ENDPOINT=$(aws cloudformation describe-stacks --stack-name $REDIS_STACK_NAME --query "Stacks[0].Outputs[?OutputKey=='RedisEndpoint'].OutputValue" --output text)
+REDIS_PORT=$(aws cloudformation describe-stacks --stack-name $REDIS_STACK_NAME --query "Stacks[0].Outputs[?OutputKey=='RedisPort'].OutputValue" --output text)
+REDIS_USER=$(aws cloudformation describe-stacks --stack-name $REDIS_STACK_NAME --query "Stacks[0].Outputs[?OutputKey=='RedisUser'].OutputValue" --output text)
 REDIS_SSL_ENABLED=TRUE
 REDIS_SSL_PROTOCOLS=Tls12
 REDIS_CHANNEL_PREFIX=seq-app
@@ -33,3 +35,5 @@ sed -i 's@REDIS_SSL_PROTOCOLS_VALUE@'"$REDIS_SSL_PROTOCOLS"'@g' $VALUES_YAML
 sed -i 's@REDIS_CHANNEL_PREFIX_VALUE@'"$REDIS_CHANNEL_PREFIX"'@g' $VALUES_YAML
 sed -i 's@REDIS_USE_COMMAND_MAP_VALUE@'"$REDIS_USE_COMMAND_MAP"'@g' $VALUES_YAML
 sed -i 's@REDIS_ENABLE_COMMAND_WATCH_VALUE@'"$REDIS_ENABLE_COMMAND_WATCH"'@g' $VALUES_YAML
+
+kubectl apply -f $VALUES_YAML

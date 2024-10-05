@@ -1,0 +1,7 @@
+{
+    "files.watcherExclude": {
+        "cdk.out/**": true,
+        ".tmp/**": false,
+        "**/node_modules/**": true
+    }
+}

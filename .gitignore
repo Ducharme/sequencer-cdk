@@ -1,12 +1,15 @@
-*.js
-!jest.config.js
-*.d.ts
-node_modules
+.tmp
+.datadog
 ~/.kube
+
+# TypeScript and Node files
+node_modules
+!jest.config.js
+bin/*.js
+lib/*.js
+*.d.ts
 
 # CDK asset staging directory
 .cdk.staging
 cdk.out
-.tmp
-.datadog
 cdk.context.json

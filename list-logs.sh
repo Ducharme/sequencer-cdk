@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # List all log groups
-log_groups=$(aws logs describe-log-groups --query 'logGroups[?starts_with(logGroupName, `/aws/lambda/RedisStack-SetPasswordFunction`)].logGroupName' --output text)
+log_groups=$(aws logs describe-log-groups --query 'logGroups[?starts_with(logGroupName, `/aws/lambda/RedisStack-SetPasswordFunction`) || starts_with(logGroupName, `/aws/lambda/RedisBaseStack-SetPasswordFunction`)].logGroupName' --output text)
 
 # Loop through each log group
 for log_group in $log_groups

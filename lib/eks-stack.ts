@@ -34,7 +34,7 @@ export class EksStack extends Stack {
       version: eks.KubernetesVersion.V1_30,
       kubectlLayer: new KubectlV30Layer(this, 'SequencerKubectlLayer'),
       authenticationMode: eks.AuthenticationMode.API_AND_CONFIG_MAP,
-      defaultCapacityInstance: new ec2.InstanceType('m7i.xlarge'),
+      defaultCapacityInstance: new ec2.InstanceType('c7i.xlarge'),
       defaultCapacity: 3,
       mastersRole: mastersRole,
       role: clusterRole

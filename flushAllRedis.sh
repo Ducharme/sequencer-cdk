@@ -1,8 +1,7 @@
 #!/bin/sh
 
-#CLUSTER_NAME=$(aws elasticache describe-serverless-caches --query 'ServerlessCaches[*].ServerlessCacheName' --output text | grep sequencer-redis)
-#CLUSTER_NAME=$(aws cloudformation describe-stacks --stack-name RedisStack --query "Stacks[0].Outputs[?OutputKey=='RedisCacheName'].OutputValue" --output text)
-CLUSTER_ENDPOINT=$(aws cloudformation describe-stacks --stack-name RedisStack --query "Stacks[0].Outputs[?OutputKey=='RedisEndpoint'].OutputValue" --output text)
+. ./setRedisStackName.sh
+CLUSTER_ENDPOINT=$(aws cloudformation describe-stacks --stack-name $REDIS_STACK_NAME --query "Stacks[0].Outputs[?OutputKey=='RedisEndpoint'].OutputValue" --output text)
 
 kubectl apply -f k8s/redis-cli-pod.yml
 kubectl wait --for=condition=Ready pod/redis-cli
