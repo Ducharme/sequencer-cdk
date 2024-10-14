@@ -5,7 +5,7 @@ metadata:
   labels:
     tags.datadoghq.com/env: poc
     tags.datadoghq.com/service: processorwebservice
-    tags.datadoghq.com/version: 0.0.25-aspnet8.0.8-bookworm-slim-datadog3.3.1
+    tags.datadoghq.com/version: 0.0.27-aspnet8.0.8-bookworm-slim-datadog3.3.1
 spec:
   replicas: 1
   selector:
@@ -17,7 +17,7 @@ spec:
         app: processorwebservice
         tags.datadoghq.com/env: poc
         tags.datadoghq.com/service: processorwebservice
-        tags.datadoghq.com/version: 0.0.25-aspnet8.0.8-bookworm-slim-datadog3.3.1
+        tags.datadoghq.com/version: 0.0.27-aspnet8.0.8-bookworm-slim-datadog3.3.1
         admission.datadoghq.com/enabled: "true"
       annotations:
         ad.datadoghq.com/app.logs: '[{"source":"csharp", "service":"processorwebservice", "tags":["company:lafleet"]}]'
@@ -28,7 +28,7 @@ spec:
       serviceAccountName: sequencer-pod-service-account
       containers:
       - name: processorwebservice
-        image: claudeducharme/processorwebservice:0.0.25-aspnet8.0.8-bookworm-slim-datadog3.3.1
+        image: claudeducharme/processorwebservice:0.0.27-aspnet8.0.8-bookworm-slim-datadog3.3.1
         ports:
         - containerPort: 8080
         envFrom:

@@ -1,7 +1,12 @@
 
 # Pre-requisites
 
-These instruction were tested on lubuntu 24.04
+These instruction were tested on lubuntu 24.04. Before starting, it is highly recommended to upgrade the system with
+```
+sudo apt-get update
+sudo apt-get upgrade
+sudo apt-get dist-upgrade
+```
 
 ## AWS user
 
@@ -36,6 +41,7 @@ aws configure
 
 ## GitHub CLI
 
+[Installing gh on Ubuntu Linux](https://github.com/cli/cli/blob/trunk/docs/install_linux.md#debian-ubuntu-linux-raspberry-pi-os-apt)
 ```
 curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg
 echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null
@@ -51,7 +57,7 @@ Follow instructions for web browser
 
 ## Node.js
 
-Install by running
+[Install & Update Script](https://github.com/nvm-sh/nvm?tab=readme-ov-file#install--update-script)
 ```
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash
 source ~/.bashrc
@@ -145,7 +151,7 @@ cdk deploy RedisBaseStack
 
 Run this command (see next step for values)
 ```
-aws eks update-kubeconfig --name <EKS_CLUSTER_NAME> --region ap-southeast-1 --role-arn arn:aws:iam::260731153371:role/EksStack-SequencerEksMastersRole<RANDOM>
+aws eks update-kubeconfig --name <EKS_CLUSTER_NAME> --region <REGION> --role-arn arn:aws:iam::<AWS_ACCOUNT_ID>:role/EksStack-SequencerEksMastersRole<RANDOM>
 ```
 To get the exact command, execute
 ```
