@@ -37,6 +37,12 @@ Then configure [Configuration basics for CLI v2](https://docs.aws.amazon.com/cli
 ```
 aws configure
 ```
+or set ENV VARS
+```
+export AWS_ACCESS_KEY=<VALUE>
+export AWS_SECRET_ACCESS_KEY=<VALUE>
+export AWS_SESSION_TOKEN=<VALUE>
+```
 
 
 ## GitHub CLI
@@ -93,7 +99,7 @@ sudo apt install helm
 helm version
 ```
 
-## Docker
+## Docker (optional for development)
 
 Run docker without admin rights
 [Docker engine install ubuntu](https://docs.docker.com/engine/install/ubuntu/)
@@ -118,7 +124,7 @@ sudo apt install ./<file>.deb
 
 # How To Deploy
 
-Run below scripts (tested with Lubuntu 20.04 default terminal)
+Run below scripts (tested with Lubuntu 24.04 default terminal)
 
 ## First step: Download scripts locally (1 minute)
 
@@ -132,11 +138,15 @@ Clone the repository which contains all the scripts
 git clone https://github.com/Ducharme/sequencer-cdk
 ```
 
-## First step: Download scripts locally (2 minutes)
+## First step: Configure then run scripts locally (2 minutes)
+
+Edit file [.env.poc](.env.poc) to set SERVERLESS value to "true" or "false" ("false" should be used for best performances). Once saved, run
 ```
 cdk bootstrap
 cdk synth
 ```
+Note: You might need to append "aws://<AWS_ACCOUNT_ID>/<REGION>" for the bootstrap
+
 
 ## Third step: Deploy core infrastructure (3 + 17 + 11 minutes)
 
@@ -144,7 +154,6 @@ cdk synth
 cdk deploy VpcStack
 cdk deploy EksStack
 cdk deploy RedisBaseStack
-
 ```
 
 ## Fourth step: Configure kubectl for AWS EKS cluster
