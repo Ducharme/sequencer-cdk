@@ -283,7 +283,7 @@
                       "name": "a",
                       "data_source": "spans",
                       "search": {
-                        "query": "env:poc -service:adminwebportal-redis service:*-redis "
+                        "query": "env:poc -service:adminwebportal-redis service:*-redis"
                       },
                       "indexes": [
                         "*"

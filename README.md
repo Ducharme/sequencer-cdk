@@ -213,6 +213,10 @@ sh generateSecretProviderClass.sh
 
 ## Seventh step: Deploy Datadog monitoring
 
+Note: Datadog website address depends on the region selected (below links were using "us5", replavce with yours as needed)
+- Subdomain can be "app" for US1-East, "us3" for US3-West, "us5" for US5-Central, "ap1" for AP1-Japan and Top-level domain will be "com"
+- Subdomain will be "app" and Top-level domain will be "eu" for EU1-Europe
+
 Setup an account first and set values in .datadog file (copy/paste and rename .datadog.example)
 - DATADOG_API_KEY create one at [https://us5.datadoghq.com/organization-settings/api-keys](https://us5.datadoghq.com/organization-settings/api-keys) named "datadog-api-secret"
 - DATADOG_APP_KUBERNETES_KEY create one at [https://us5.datadoghq.com/personal-settings/application-keys](https://us5.datadoghq.com/personal-settings/application-keys) named "datadog-app-kubernetes-secret"
@@ -227,11 +231,13 @@ Test
 ```
 kubectl logs -l app=datadog -c agent
 ```
-Also have a look at (replace <site> with yours) [https://site.datadoghq.com/organization-settings/remote-config/capabilities](https://site.datadoghq.com/organization-settings/remote-config/capabilities)
+Also have a look at (replace <site> with yours) [https://us5.datadoghq.com/organization-settings/remote-config/capabilities](https://site.datadoghq.com/organization-settings/remote-config/capabilities)
 
-Import dashboard datadog-dashboard-performance.json
+Import dashboard [datadog-dashboard-performance.json](datadog-dashboard-performance.json)
 
 Add AWS Account from Integration/Amazon Web Services (select to run the CloudFormation Stack) then enable EXTENDED RESOURCE COLLECTION for AWS cloud account under infrastructure/catalog/configuration.
+
+Follow instructions to [Setup log pipelines](DATADOG.md#setup-log-pipelines)
 
 ## Eigth step: Deploy application
 
@@ -277,4 +283,27 @@ To keep logs you can send output to a file for record. naming below is the R#, N
 ```
 mkdir -p .tmp/perfs
 sh testAll.sh > .tmp/perfs/R25-60000_0_0-1_10_3-3ec2c7xl-100000ecpu.log
+```
+
+Datadog log filters for processing
+```
+service:processorwebservice ("1:poc;" OR "60000:poc;")
+```
+Datadog log filters for processing
+```
+service:sequencerwebservice ("with sequence id 1 to" OR "with sequence id 60000 to")
+```
+Datadog log filters for processing & sequencing
+```
+(service:processorwebservice AND "contains message 1:poc;") OR (service:sequencerwebservice AND "with sequence id 60000 to")
+```
+
+
+ALL -- Stats from 1 to 60000
+```json
+{"start":1,"count":60000,"stats":{"createdToProcessingStats":{"50p":3198,"90p":5284,"95p":5469,"99p":5845,"avg":3197.75,"min":469,"max":5881},"processingToProcessedStats":{"50p":8,"90p":18,"95p":29,"99p":169.01,"avg":13.06,"min":1,"max":250},"processedToSequencingStats":{"50p":481,"90p":725,"95p":779,"99p":856,"avg":482.67,"min":47,"max":1026},"sequencingToSavedStats":{"50p":17,"90p":34,"95p":43,"99p":43,"avg":18.55,"min":2,"max":43},"savedToSequencedStats":{"50p":0,"90p":1,"95p":8,"99p":8,"avg":0.8,"min":0,"max":8},"processingToSequencedStats":{"50p":512,"90p":751,"95p":809,"99p":1009,"avg":515.08,"min":95,"max":1048},"createdToSequencedStats":{"50p":3787,"90p":5868,"95p":5869,"99p":6236,"avg":3712.83,"min":715,"max":6236},"maxCreatedToProcessingSeq":{"max":5881,"seq":59998},"maxProcessingToProcessedSeq":{"max":250,"seq":57491},"maxProcessedToSequencingSeq":{"max":1026,"seq":41047},"maxSequencingToSavedSeq":{"max":43,"seq":9340},"maxSavedToSequencedSeq":{"max":8,"seq":9340},"maxProcessingToSequencedSeq":{"max":1048,"seq":41074},"maxCreatedToSequencedSeq":{"max":6236,"seq":57451},"minCreatedToProcessingSeq":{"min":469,"seq":1},"minProcessingToProcessedSeq":{"min":1,"seq":12536},"minProcessedToSequencingSeq":{"min":47,"seq":742},"minSequencingToSavedSeq":{"min":2,"seq":57451},"minSavedToSequencedSeq":{"min":0,"seq":743},"minProcessingToSequencedSeq":{"min":95,"seq":742},"minCreatedToSequencedSeq":{"min":715,"seq":1}},"check":{"firstSeq":1,"lastSeq":60000,"isOrdered":true,"brokenAfter":null,"brokenSeq":null,"others":[]}}
+```
+ALL -- Perfs from 1 to 60000
+```json
+{"start":1,"count":60000,"perfs":{"processingRatePerSecond":{"0":10305,"1":11024,"2":12450,"3":10101,"4":13035,"5":3085},"sequencingRatePerSecond":{"0":4673,"1":9012,"2":14147,"3":13213,"4":8451,"5":10504},"processingRatePerSecondStats":{"50p":10664.5,"90p":12742.5,"95p":12888.75,"99p":13005.75,"avg":10000,"min":3085,"max":13035},"sequencingRatePerSecondStats":{"50p":9758,"90p":13680,"95p":13913.5,"99p":14100.3,"avg":10000,"min":4673,"max":14147},"averageRatePerSecond":10395.010395010395}}
 ```

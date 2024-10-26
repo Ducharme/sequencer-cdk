@@ -97,7 +97,7 @@ elif [ "$NB_MESSAGES" -le 10000 ]; then
 elif [ "$NB_MESSAGES" -le 100000 ]; then
     increment=10000
 else
-    increment=10000  # Default for larger numbers
+    increment=100000  # Default for larger numbers
 fi
 start=1
 end=$NB_MESSAGES
@@ -115,7 +115,7 @@ end=$NB_MESSAGES
 echo "ALL -- Stats from $start to $end"
 curl -s -X GET "http://$ADMIN_CONTAINER_HOST:$ADMIN_CONTAINER_PORT/list/stats?name=$GROUP_NAME&start=$start&count=$end"
 echo ""
-echo "ALL -- perfs from $start to $end"
+echo "ALL -- Perfs from $start to $end"
 curl -s -X GET "http://$ADMIN_CONTAINER_HOST:$ADMIN_CONTAINER_PORT/list/perfs?name=$GROUP_NAME&start=$start&count=$end"
 echo ""
 
