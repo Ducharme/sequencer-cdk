@@ -2,6 +2,15 @@ apiVersion: v1
 kind: Service
 metadata:
   name: adminwebportal-lb
+  annotations:
+    # Classic ELB annotations with timeout at 10 minutes
+    service.beta.kubernetes.io/aws-load-balancer-type: classic
+    service.beta.kubernetes.io/aws-load-balancer-connection-idle-timeout: "600"
+    service.beta.kubernetes.io/aws-load-balancer-connection-draining-enabled: "true"
+    service.beta.kubernetes.io/aws-load-balancer-connection-draining-timeout: "60"
+    # Optional annotations
+    service.beta.kubernetes.io/aws-load-balancer-internal: "false"
+    service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled: "true"
 spec:
   type: LoadBalancer
   ports:

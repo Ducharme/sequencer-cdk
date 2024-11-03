@@ -5,7 +5,7 @@ metadata:
   labels:
     tags.datadoghq.com/env: poc
     tags.datadoghq.com/service: adminwebportal
-    tags.datadoghq.com/version: 0.0.28-aspnet8.0.8-bookworm-slim-datadog3.3.1
+    tags.datadoghq.com/version: 0.0.35-aspnet8.0.8-bookworm-slim-datadog3.3.1
 spec:
   replicas: 1
   selector:
@@ -17,7 +17,7 @@ spec:
         app: adminwebportal
         tags.datadoghq.com/env: poc
         tags.datadoghq.com/service: adminwebportal
-        tags.datadoghq.com/version: 0.0.28-aspnet8.0.8-bookworm-slim-datadog3.3.1
+        tags.datadoghq.com/version: 0.0.35-aspnet8.0.8-bookworm-slim-datadog3.3.1
         admission.datadoghq.com/enabled: "true"
       annotations:
         ad.datadoghq.com/app.logs: '[{"source":"csharp", "service":"adminwebportal", "tags":["company:lafleet"]}]'
@@ -29,12 +29,19 @@ spec:
       serviceAccountName: sequencer-pod-service-account
       containers:
       - name: adminwebportal
-        image: claudeducharme/adminwebportal:0.0.28-aspnet8.0.8-bookworm-slim-datadog3.3.1
+        image: claudeducharme/adminwebportal:0.0.35-aspnet8.0.8-bookworm-slim-datadog3.3.1
         ports:
         - containerPort: 8080
         envFrom:
         - configMapRef:
             name: sequencer-config
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "500m"
+          limits:
+            memory: "3Gi"
+            cpu: "2"
         env:
         - name: REDIS_PASSWORD
           valueFrom:
@@ -92,6 +99,28 @@ spec:
         - name: DD_PROFILING_HEAP_ENABLED
           value: "true"
         - name: DD_PROFILING_GC_ENABLED
+          value: "true"
+        - name: DOTNET_SYSTEM_NET_SOCKETS_PARALLEL_IO
+          value: "true"
+        - name: DOTNET_ThreadPool_UnfairSemaphoreSpinLimit
+          value: "0"
+        - name: DOTNET_ThrowUnobservedTaskExceptions
+          value: "true"
+        - name: ASPNETCORE_ENVIRONMENT
+          value: "Development"
+        - name: DOTNET_MAX_CPU_COUNT
+          value: "2"
+        - name: COMPlus_gcServer
+          value: "1"
+        - name: COMPlus_Thread_UseAllCpuGroups
+          value: "1"
+        - name: DOTNET_GCHeapHardLimit
+          value: "3072864000"  # ~3GB in bytes
+        - name: DOTNET_gcAllowVeryLargeObjects
+          value: "1"
+        - name: ASPNETCORE_GC_HEAP_LIMIT_PERCENT
+          value: "80"
+        - name: DOTNET_RUNNING_IN_CONTAINER
           value: "true"
         readinessProbe:
           httpGet:
