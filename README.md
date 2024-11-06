@@ -128,17 +128,16 @@ Run below scripts (tested with Lubuntu 24.04 default terminal)
 
 ## First step: Download scripts locally (1 minute)
 
-Create a folder for the project and go inside
-```
-mkdir sequencer-cdk && cd sequencer-cdk
-```
-
 Clone the repository which contains all the scripts
 ```
 git clone https://github.com/Ducharme/sequencer-cdk
 ```
+Install dependecies
+```
+npm install
+```
 
-## First step: Configure then run scripts locally (2 minutes)
+## Second step: Configure then run scripts locally (2 minutes)
 
 Edit file [.env.poc](.env.poc) to set SERVERLESS value to "true" or "false" ("false" should be used for best performances). Once saved, run
 ```
