@@ -5,7 +5,7 @@ metadata:
   labels:
     tags.datadoghq.com/env: poc
     tags.datadoghq.com/service: adminwebportal
-    tags.datadoghq.com/version: 0.0.35-aspnet8.0.8-bookworm-slim-datadog3.3.1
+    tags.datadoghq.com/version: 0.0.37-aspnet8.0.8-bookworm-slim-datadog3.3.1
 spec:
   replicas: 1
   selector:
@@ -17,19 +17,18 @@ spec:
         app: adminwebportal
         tags.datadoghq.com/env: poc
         tags.datadoghq.com/service: adminwebportal
-        tags.datadoghq.com/version: 0.0.35-aspnet8.0.8-bookworm-slim-datadog3.3.1
+        tags.datadoghq.com/version: 0.0.37-aspnet8.0.8-bookworm-slim-datadog3.3.1
         admission.datadoghq.com/enabled: "true"
       annotations:
         ad.datadoghq.com/app.logs: '[{"source":"csharp", "service":"adminwebportal", "tags":["company:lafleet"]}]'
         admission.datadoghq.com/dotnet-lib.version: v2.57.0
         admission.datadoghq.com/adminwebportal.apm-instrumentation: "true"
         admission.datadoghq.com/adminwebportal.apm-socket: "/var/run/datadog/apm.socket"
-        
     spec:
       serviceAccountName: sequencer-pod-service-account
       containers:
       - name: adminwebportal
-        image: claudeducharme/adminwebportal:0.0.35-aspnet8.0.8-bookworm-slim-datadog3.3.1
+        image: claudeducharme/adminwebportal:0.0.37-aspnet8.0.8-bookworm-slim-datadog3.3.1
         ports:
         - containerPort: 8080
         envFrom:
@@ -40,7 +39,7 @@ spec:
             memory: "512Mi"
             cpu: "500m"
           limits:
-            memory: "3Gi"
+            memory: "6Gi"
             cpu: "2"
         env:
         - name: REDIS_PASSWORD
@@ -110,18 +109,48 @@ spec:
           value: "Development"
         - name: DOTNET_MAX_CPU_COUNT
           value: "2"
-        - name: COMPlus_gcServer
+        # Enable workstation GC if server GC isn't utilizing both cores
+        # - name: DOTNET_gcServer # System.GC.Server
+        #   value: "0"
+        - name: DOTNET_gcConcurrent
           value: "1"
-        - name: COMPlus_Thread_UseAllCpuGroups
+        - name: DOTNET_Thread_UseAllCpuGroups
           value: "1"
         - name: DOTNET_GCHeapHardLimit
-          value: "3072864000"  # ~3GB in bytes
+          value: "6442450944"  # ~6GB in bytes
         - name: DOTNET_gcAllowVeryLargeObjects
           value: "1"
-        - name: ASPNETCORE_GC_HEAP_LIMIT_PERCENT
-          value: "80"
         - name: DOTNET_RUNNING_IN_CONTAINER
           value: "true"
+        # New/modified settings for better CPU utilization
+        - name: DOTNET_ThreadPool_MinThreads
+          value: "8"  # 4 threads per core
+        - name: DOTNET_ThreadPool_MaxThreads
+          value: "128"
+        - name: COMPlus_ThreadPool_ForceMinWorkerThreads
+          value: "8"
+        - name: COMPlus_ThreadPool_ForceMaxWorkerThreads
+          value: "128"
+        - name: DOTNET_TieredPGO
+          value: "1"
+        - name: DOTNET_ReadyToRun
+          value: "0"
+        - name: DOTNET_TC_QuickJitForLoops
+          value: "1"
+        # - name: DOTNET_GC_LOH_COMPACTION_MODE
+        #   value: "2"
+        # - name: DOTNET_GC_LATENCY_MODE
+        #   value: "Interactive"
+        # - name: KESTREL_ALLOW_SYNC_IO
+        #   value: "false"
+        # - name: KESTREL_MAX_REQUEST_BODY_SIZE_MB
+        #   value: "100"
+        # - name: KESTREL_MAX_REQUEST_BUFFER_SIZE_MB
+        #   value: "100"
+        # - name: JSON_BUFFER_SIZE_KB
+        #   value: "16"
+        # - name: IIS_MAX_REQUEST_SIZE_MB
+        #   value: "100"
         readinessProbe:
           httpGet:
             path: /healthz
