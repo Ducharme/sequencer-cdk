@@ -306,3 +306,38 @@ ALL -- Perfs from 1 to 60000
 ```json
 {"start":1,"count":60000,"perfs":{"processingRatePerSecond":{"0":10305,"1":11024,"2":12450,"3":10101,"4":13035,"5":3085},"sequencingRatePerSecond":{"0":4673,"1":9012,"2":14147,"3":13213,"4":8451,"5":10504},"processingRatePerSecondStats":{"50p":10664.5,"90p":12742.5,"95p":12888.75,"99p":13005.75,"avg":10000,"min":3085,"max":13035},"sequencingRatePerSecondStats":{"50p":9758,"90p":13680,"95p":13913.5,"99p":14100.3,"avg":10000,"min":4673,"max":14147},"averageRatePerSecond":10395.010395010395}}
 ```
+
+# How To Destroy
+
+Note the following command will not detect dependencies properly and will fail
+```
+cdk destroy --all --force
+```
+
+## Option 1: One by one with CDK
+```
+kubectl delete -f k8s/adminwebportal-loadbalancer.yml
+aws cloudformation delete-stack --stack-name DatadogIntegration
+cdk destroy RedisClusterStack
+cdk destroy RedisBaseStack
+cdk destroy EksStack
+cdk destroy VpcStack
+```
+
+## Option 2: One by one with CloudFormation
+```
+kubectl delete -f k8s/adminwebportal-loadbalancer.yml
+aws cloudformation list-stacks --stack-status-filter CREATE_COMPLETE UPDATE_COMPLETE --query 'StackSummaries[].{Name:StackName,Status:StackStatus,Updated:LastUpdatedTime}' --output table
+aws cloudformation delete-stack --stack-name DatadogIntegration && aws cloudformation wait stack-delete-complete --stack-name DatadogIntegration
+aws cloudformation delete-stack --stack-name RedisClusterStack
+aws cloudformation delete-stack --stack-name RedisBaseStack
+aws cloudformation delete-stack --stack-name EksStack
+aws cloudformation delete-stack --stack-name VpcStack
+```
+
+## Issues
+
+In case VpcStack fails to be deleted because of used ENI by ELB or other reasons, run
+```
+sh delete_vpc_dependencies.sh
+```

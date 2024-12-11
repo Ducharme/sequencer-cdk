@@ -1,5 +1,6 @@
+import { IConstruct } from 'constructs';
 import { Construct } from 'constructs';
-import { Stack, StackProps } from 'aws-cdk-lib';
+import { Stack, StackProps, RemovalPolicy, Aspects, IAspect, CfnResource } from 'aws-cdk-lib';
 import * as ec2 from 'aws-cdk-lib/aws-ec2';
 import { EC2 } from "@aws-sdk/client-ec2";
 
@@ -31,5 +32,42 @@ export class VpcStack extends Stack {
         },
       ],
     });
+
+    // Add removal policies
+    this.vpc.applyRemovalPolicy(RemovalPolicy.DESTROY);
+    // Apply removal policy to all subnets
+    for (const subnet of this.vpc.publicSubnets) {
+      (subnet.node.defaultChild as CfnResource)?.applyRemovalPolicy(RemovalPolicy.DESTROY);
+    }
+    for (const subnet of this.vpc.privateSubnets) {
+      (subnet.node.defaultChild as CfnResource)?.applyRemovalPolicy(RemovalPolicy.DESTROY);
+    }
+    // Apply removal policy to NAT gateways
+    const cfnVpc = this.vpc.node.defaultChild as ec2.CfnVPC;
+    cfnVpc.applyRemovalPolicy(RemovalPolicy.DESTROY);
+
+    // Optional: Add aspect to ensure all VPC-related resources are destroyed
+    this.addVpcDestroyAspect();
+  }
+
+  private addVpcDestroyAspect() {
+    // Add an aspect to apply removal policy to all VPC-related resources
+    class VpcResourcesRemovalAspect implements IAspect {
+      public visit(node: IConstruct): void {
+        if (
+          node instanceof ec2.CfnVPC || 
+          node instanceof ec2.CfnSubnet || 
+          node instanceof ec2.CfnRouteTable || 
+          node instanceof ec2.CfnNetworkAcl || 
+          node instanceof ec2.CfnSecurityGroup ||
+          node instanceof ec2.CfnNatGateway ||
+          node instanceof ec2.CfnInternetGateway
+        ) {
+          node.applyRemovalPolicy(RemovalPolicy.DESTROY);
+        }
+      }
+    }
+
+    Aspects.of(this).add(new VpcResourcesRemovalAspect());
   }
 }
